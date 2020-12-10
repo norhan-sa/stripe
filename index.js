@@ -23,6 +23,10 @@
         key: Publishable_Key 
      }); 
  }); 
+
+ app.get('/key',(req,res)=>{
+  return res.send({publicKey: Publishable_Key , status:200});
+ });
   
  app.post('/payment', function(req, res){ 
   
