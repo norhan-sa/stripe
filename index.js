@@ -20,9 +20,9 @@
  app.set('view engine', 'ejs'); 
   
  app.get('/', function(req, res){ 
-     res.render('Home', { 
-        key: Publishable_Key 
-     }); 
+    res.render('Home', { 
+      key: Publishable_Key 
+    }); 
  }); 
  
  app.use('/',stripe_pay);
@@ -33,11 +33,10 @@
  });
  
  app.get('/failed',(req,res)=>{
-    return res.send('Failed');  
+   return res.send('Failed');  
  });
- 
   
  app.listen(port, function(error){ 
-     if(error) throw error 
-     console.log("Server created Successfully") 
+    if(error) throw error 
+    console.log("Server created Successfully") 
  }); 

@@ -14,57 +14,81 @@
     'client_secret': Paypal_Secret
  });
 
- router.post('/paypal/create-payment',(req,res)=>{
-
-    var payReq = JSON.stringify({
-        'intent':'sale',
-        'redirect_urls':{
-            'return_url':'https://stripe-nour.herokuapp.com/success',
-            'cancel_url':'https://stripe-nour.herokuapp.com/failed'
+ router.post('/paypal/pay',(req,res)=>{
+  
+    const create_payment_json = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
         },
-        'payer':{
-            'payment_method':'paypal'
+        "redirect_urls": {
+            "return_url": "https://stripe-nour.herokuapp.com/success",
+            "cancel_url": "https://stripe-nour.herokuapp.com/cancel"
         },
-        'transactions':[{
-            'amount':{
-                'total':'7.47',
-                'currency':'USD'
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": "item",
+                    "sku": "item",
+                    "price": "25.00",
+                    "currency": "USD",
+                    "quantity": 1
+                }]
             },
-            'description':'This is the payment transaction description.'
+            "amount": {
+                "currency": "USD",
+                "total": "25.00"
+            },
+            "description": "This is the payment description."
         }]
-    }); 
+    };
 
-        paypal.payment.create(payReq, function(error, payment){
-        if(error){
-            console.error(error);
-            res.status(400).end();
+    paypal.payment.create(create_payment_json, function (error, payment) {
+        if (error) {
+            console.log(`PayPal Create Payment Error : `+ error.message);
         } else {
-            return res.send({id:payment.id});
-        }
-    });
- });
-
-
- router.post('/paypal/execute-payment',(req,res)=>{
-
-    var paymentId = req.body.paymentID;
-    var payerId = req.body.payerID;
-
-    console.log(req.body);
-    
-        paypal.payment.execute(paymentId, payerId, function(error, payment){
-        if(error){
-            console.error(error);
-        } else {
-             
-            if (payment.state == 'approved'){ 
-                res.send('payment completed successfully');
-            } else {
-                res.send('payment not successful');
+            for(let i  = 0; i < payment.links.length; ++i){
+                if(payment.links[i].rel === 'approval_url'){
+                    res.redirect(payment.links[i].href);
+                }
             }
         }
     });
+
  });
 
+
+ router.get('/success',(req,res)=>{
+
+  const payerId = req.query.PayerID;
+  const paymentId = req.query.paymentId;
+
+  var execute_payment_json = {
+    "payer_id": payerId,
+    "transactions": [{
+        "amount": {
+            "currency": "USD",
+            "total": "25.00"
+        }
+    }]
+   };
+
+   paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
+    if (error) {
+        console.log(error.response);
+        res.send('error')
+    } else {
+        console.log("Get Payment Response");
+        console.log(JSON.stringify(payment));
+        res.send('success');
+    }
+   }); 
+ });
+
+
+
+ router.get('/cancel', (req,res)=>{
+   res.send('canceled');
+ });
 
  module.exports = router;
