@@ -51,7 +51,9 @@
         } else {
             for(let i  = 0; i < payment.links.length; ++i){
                 if(payment.links[i].rel === 'approval_url'){
-                    res.send({redirect_url: payment.links[i].href});
+                   if(req.get('User-Agent') === 'mobile')
+                      res.send({redirect_url: payment.links[i].href});
+                   else res.redirect(payment.links[i].href);   
                 }
             }
         }
