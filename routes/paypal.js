@@ -51,7 +51,7 @@
         } else {
             for(let i  = 0; i < payment.links.length; ++i){
                 if(payment.links[i].rel === 'approval_url'){
-                   if(req.get('User-Agent') === 'mobile')
+                   if(req.get('User-Agent') === 'Dart/2.10 (dart:io)')
                       res.send({redirect_url: payment.links[i].href});
                    else res.redirect(payment.links[i].href);   
                 }
