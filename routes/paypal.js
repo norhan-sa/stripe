@@ -15,6 +15,8 @@
  });
 
  router.post('/paypal/pay',(req,res)=>{
+
+    console.log(req.get('User-Agent'));
   
     const create_payment_json = {
         "intent": "sale",
