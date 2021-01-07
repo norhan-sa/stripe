@@ -1,6 +1,6 @@
 
  const router = require('express').Router();
- const  axios =   require('axios');
+
  const paypal = require('paypal-rest-sdk');
  require('dotenv').config();
 
@@ -49,7 +49,7 @@
         } else {
             for(let i  = 0; i < payment.links.length; ++i){
                 if(payment.links[i].rel === 'approval_url'){
-                    res.redirect(payment.links[i].href);
+                    res.send({redirect_url: payment.links[i].href});
                 }
             }
         }
